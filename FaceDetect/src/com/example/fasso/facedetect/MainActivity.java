@@ -1,10 +1,6 @@
 package com.example.fasso.facedetect;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 
 import android.app.Activity;
 import android.content.Context;
@@ -64,6 +60,14 @@ public class MainActivity extends Activity implements OnClickListener {
 		Button btnGalary = (Button) findViewById(R.id.btn_galary);
 		btnGalary.setOnClickListener(this);
 
+		/** Show default Image */
+		BitmapFactory.Options BitmapFactoryOptionsbfo = new BitmapFactory.Options();
+		BitmapFactoryOptionsbfo.inPreferredConfig = Bitmap.Config.RGB_565;
+
+		/** In case want to Upload Image from drwable folder */
+		myBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.face_detection, BitmapFactoryOptionsbfo);
+		View v = new myView(this);
+		addToLayout(v);
 	}
 
 	@Override
@@ -112,31 +116,8 @@ public class MainActivity extends Activity implements OnClickListener {
 					myBitmap = Bitmap.createScaledBitmap(myBitmap, width, calculateNewHeight(myBitmap), true);
 
 					View v = new myView(this);
-					LinearLayout llImage = (LinearLayout) findViewById(R.id.ll_add_image);
-					llImage.removeAllViews();
-					llImage.addView(v);
+					addToLayout(v);
 
-					// String path = android.os.Environment.getExternalStorageDirectory() + File.separator + "Download";
-					// f.delete();
-					//
-					// OutputStream outFile = null;
-					// File file = new File(path, String.valueOf(System.currentTimeMillis()) + ".jpg");
-					// try {
-					// outFile = new FileOutputStream(file);
-					// myBitmap.compress(Bitmap.CompressFormat.JPEG, 40, outFile);
-					//
-					//
-					// outFile.flush();
-					// outFile.close();
-					//
-					//
-					// } catch (FileNotFoundException e) {
-					// e.printStackTrace();
-					// } catch (IOException e) {
-					// e.printStackTrace();
-					// } catch (Exception e) {
-					// e.printStackTrace();
-					// }
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -147,27 +128,37 @@ public class MainActivity extends Activity implements OnClickListener {
 
 				Cursor c = getContentResolver().query(selectedImage, filePath, null, null, null);
 				c.moveToFirst();
-				int columnIndex = c.getColumnIndex(filePath[0]);
-				String picturePath = c.getString(columnIndex);
+				String picturePath = c.getString(c.getColumnIndex(filePath[0]));
 				c.close();
 
-				/** Initialised BitMap Images */
+				/** Initialized Bitmap Images with RGB 565 */
 				BitmapFactory.Options BitmapFactoryOptionsbfo = new BitmapFactory.Options();
 				BitmapFactoryOptionsbfo.inPreferredConfig = Bitmap.Config.RGB_565;
 
 				myBitmap = BitmapFactory.decodeFile(picturePath, BitmapFactoryOptionsbfo);
+
 				/**
 				 * Width would be same as device but height of image may vary as per ratio of
 				 */
 				myBitmap = Bitmap.createScaledBitmap(myBitmap, width, calculateNewHeight(myBitmap), true);
 
-				Log.w("path of image from gallery......******************.........", picturePath + "");
+				/** Marking Face in this Class */
 				View v = new myView(this);
-				LinearLayout llImage = (LinearLayout) findViewById(R.id.ll_add_image);
-				llImage.removeAllViews();
-				llImage.addView(v);
+				addToLayout(v);
+
 			}
 		}
+	}
+
+	public void addToLayout(View v) {
+		LinearLayout llImage = (LinearLayout) findViewById(R.id.ll_add_image);
+
+		/** Remove Previous any added view */
+		llImage.removeAllViews();
+		llImage.invalidate();
+
+		/** Attach New View in layout with face marking */
+		llImage.addView(v);
 	}
 
 	/** height of image may vary as per ratio of Image with respect to width */
@@ -177,10 +168,11 @@ public class MainActivity extends Activity implements OnClickListener {
 		return (int) newHeight;
 	}
 
+	/** Custom View to detect Face in Given Image */
 	private class myView extends View {
 
 		private int imageWidth, imageHeight;
-		private int numberOfFace = 5;
+		private int numberOfFace = 10;
 		private FaceDetector myFaceDetect;
 		private FaceDetector.Face[] myFace;
 
@@ -194,7 +186,6 @@ public class MainActivity extends Activity implements OnClickListener {
 			BitmapFactory.Options BitmapFactoryOptionsbfo = new BitmapFactory.Options();
 			BitmapFactoryOptionsbfo.inPreferredConfig = Bitmap.Config.RGB_565;
 
-			// myBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.face_detection,BitmapFactoryOptionsbfo);
 			if (myBitmap != null) {
 				imageWidth = myBitmap.getWidth();
 				imageHeight = myBitmap.getHeight();
