@@ -65,6 +65,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		/** In case want to Upload Image from drwable folder */
 		myBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.face_detection, BitmapFactoryOptionsbfo);
+		myBitmap = Bitmap.createScaledBitmap(myBitmap, width, calculateNewHeight(myBitmap), true);
 		View v = new myView(this);
 		addToLayout(v);
 	}
