@@ -2,6 +2,8 @@ package com.example.fasso.facedetect;
 
 import java.io.File;
 
+import com.example.fasso.log.L;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -183,15 +185,19 @@ public class MainActivity extends Activity implements OnClickListener {
 
 			super(context);
 
-			BitmapFactory.Options BitmapFactoryOptionsbfo = new BitmapFactory.Options();
-			BitmapFactoryOptionsbfo.inPreferredConfig = Bitmap.Config.RGB_565;
-
 			if (myBitmap != null) {
 				imageWidth = myBitmap.getWidth();
 				imageHeight = myBitmap.getHeight();
 
+				/** Max number of faces to be detected*/
 				myFace = new FaceDetector.Face[numberOfFace];
+				
+				/**Creates a FaceDetector, configured with the size of the images to be analyzed and the 
+				 * numberOfFace = maximum number of faces that can be detected. 
+				 * Note that the width of the image must be even.*/
 				myFaceDetect = new FaceDetector(imageWidth, imageHeight, numberOfFace);
+				
+				/**Finds all the faces found in a given android.graphics.Bitmap*/
 				numberOfFaceDetected = myFaceDetect.findFaces(myBitmap, myFace);
 
 				Toast.makeText(MainActivity.this, "FaceCount=" + numberOfFaceDetected, Toast.LENGTH_LONG).show();
@@ -213,7 +219,10 @@ public class MainActivity extends Activity implements OnClickListener {
 				Face face = myFace[i];
 				PointF myMidPoint = new PointF();
 				face.getMidPoint(myMidPoint);
+			
 				myEyesDistance = face.eyesDistance();
+				
+				L.t(this.getContext(), myMidPoint.x+"" + myMidPoint.y+" - "+myEyesDistance);
 
 				canvas.drawRect((int) (myMidPoint.x - myEyesDistance * 2), (int) (myMidPoint.y - myEyesDistance * 2),
 						(int) (myMidPoint.x + myEyesDistance * 2), (int) (myMidPoint.y + myEyesDistance * 2), myPaint);
