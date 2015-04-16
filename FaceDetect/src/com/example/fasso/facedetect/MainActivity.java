@@ -30,7 +30,7 @@ import android.widget.Toast;
 public class MainActivity extends Activity implements OnClickListener {
 
 	Bitmap myBitmap;
-	private static int height;
+
 	private static int width;
 
 	@Override
@@ -48,11 +48,11 @@ public class MainActivity extends Activity implements OnClickListener {
 		DisplayMetrics metrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-		height = metrics.heightPixels;
 		width = metrics.widthPixels;
 
 		/** Display just for Visibility */
-		Toast.makeText(this, "Height: " + height + " " + "Width: " + width, Toast.LENGTH_LONG).show();
+		// Toast.makeText(this, "Height: " + height + " " + "Width: " + width,
+		// Toast.LENGTH_LONG).show();
 
 		/** Initialize with click event */
 		Button btnAdd = (Button) findViewById(R.id.btn_add);
@@ -66,8 +66,10 @@ public class MainActivity extends Activity implements OnClickListener {
 		BitmapFactoryOptionsbfo.inPreferredConfig = Bitmap.Config.RGB_565;
 
 		/** In case want to Upload Image from drwable folder */
-		myBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.face_detection, BitmapFactoryOptionsbfo);
-		myBitmap = Bitmap.createScaledBitmap(myBitmap, width, calculateNewHeight(myBitmap), true);
+		myBitmap = BitmapFactory.decodeResource(getResources(),
+				R.drawable.face_detection, BitmapFactoryOptionsbfo);
+		myBitmap = Bitmap.createScaledBitmap(myBitmap, width,
+				calculateNewHeight(myBitmap), true);
 		View v = new myView(this);
 		addToLayout(v);
 	}
@@ -78,13 +80,17 @@ public class MainActivity extends Activity implements OnClickListener {
 		switch (v.getId()) {
 		case R.id.btn_add:
 			intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-			File f = new File(android.os.Environment.getExternalStorageDirectory(), "temp.jpg");
+			File f = new File(
+					android.os.Environment.getExternalStorageDirectory(),
+					"temp.jpg");
 			intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
 			startActivityForResult(intent, 1);
 			break;
 
 		case R.id.btn_galary:
-			intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+			intent = new Intent(
+					Intent.ACTION_PICK,
+					android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 			startActivityForResult(intent, 2);
 			break;
 
@@ -99,7 +105,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		super.onActivityResult(requestCode, resultCode, data);
 		if (resultCode == RESULT_OK) {
 			if (requestCode == 1) {
-				File f = new File(Environment.getExternalStorageDirectory().toString());
+				File f = new File(Environment.getExternalStorageDirectory()
+						.toString());
 				for (File temp : f.listFiles()) {
 					if (temp.getName().equals("temp.jpg")) {
 						f = temp;
@@ -110,12 +117,15 @@ public class MainActivity extends Activity implements OnClickListener {
 					BitmapFactory.Options BitmapFactoryOptionsbfo = new BitmapFactory.Options();
 					BitmapFactoryOptionsbfo.inPreferredConfig = Bitmap.Config.RGB_565;
 
-					myBitmap = BitmapFactory.decodeFile(f.getAbsolutePath(), BitmapFactoryOptionsbfo);
+					myBitmap = BitmapFactory.decodeFile(f.getAbsolutePath(),
+							BitmapFactoryOptionsbfo);
 
 					/**
-					 * Width would be same as device but height of image may vary as per ratio of
+					 * Width would be same as device but height of image may
+					 * vary as per ratio of
 					 */
-					myBitmap = Bitmap.createScaledBitmap(myBitmap, width, calculateNewHeight(myBitmap), true);
+					myBitmap = Bitmap.createScaledBitmap(myBitmap, width,
+							calculateNewHeight(myBitmap), true);
 
 					View v = new myView(this);
 					addToLayout(v);
@@ -128,7 +138,8 @@ public class MainActivity extends Activity implements OnClickListener {
 				Uri selectedImage = data.getData();
 				String[] filePath = { MediaStore.Images.Media.DATA };
 
-				Cursor c = getContentResolver().query(selectedImage, filePath, null, null, null);
+				Cursor c = getContentResolver().query(selectedImage, filePath,
+						null, null, null);
 				c.moveToFirst();
 				String picturePath = c.getString(c.getColumnIndex(filePath[0]));
 				c.close();
@@ -137,12 +148,15 @@ public class MainActivity extends Activity implements OnClickListener {
 				BitmapFactory.Options BitmapFactoryOptionsbfo = new BitmapFactory.Options();
 				BitmapFactoryOptionsbfo.inPreferredConfig = Bitmap.Config.RGB_565;
 
-				myBitmap = BitmapFactory.decodeFile(picturePath, BitmapFactoryOptionsbfo);
+				myBitmap = BitmapFactory.decodeFile(picturePath,
+						BitmapFactoryOptionsbfo);
 
 				/**
-				 * Width would be same as device but height of image may vary as per ratio of
+				 * Width would be same as device but height of image may vary as
+				 * per ratio of
 				 */
-				myBitmap = Bitmap.createScaledBitmap(myBitmap, width, calculateNewHeight(myBitmap), true);
+				myBitmap = Bitmap.createScaledBitmap(myBitmap, width,
+						calculateNewHeight(myBitmap), true);
 
 				/** Marking Face in this Class */
 				View v = new myView(this);
@@ -189,18 +203,23 @@ public class MainActivity extends Activity implements OnClickListener {
 				imageWidth = myBitmap.getWidth();
 				imageHeight = myBitmap.getHeight();
 
-				/** Max number of faces to be detected*/
+				/** Max number of faces to be detected */
 				myFace = new FaceDetector.Face[numberOfFace];
-				
-				/**Creates a FaceDetector, configured with the size of the images to be analyzed and the 
-				 * numberOfFace = maximum number of faces that can be detected. 
-				 * Note that the width of the image must be even.*/
-				myFaceDetect = new FaceDetector(imageWidth, imageHeight, numberOfFace);
-				
-				/**Finds all the faces found in a given android.graphics.Bitmap*/
+
+				/**
+				 * Creates a FaceDetector, configured with the size of the
+				 * images to be analyzed and the numberOfFace = maximum number
+				 * of faces that can be detected. Note that the width of the
+				 * image must be even.
+				 */
+				myFaceDetect = new FaceDetector(imageWidth, imageHeight,
+						numberOfFace);
+
+				/** Finds all the faces found in a given android.graphics.Bitmap */
 				numberOfFaceDetected = myFaceDetect.findFaces(myBitmap, myFace);
 
-				Toast.makeText(MainActivity.this, "FaceCount=" + numberOfFaceDetected, Toast.LENGTH_LONG).show();
+				// Toast.makeText(MainActivity.this, "FaceCount=" +
+				// numberOfFaceDetected, Toast.LENGTH_LONG).show();
 			}
 		}
 
@@ -219,13 +238,25 @@ public class MainActivity extends Activity implements OnClickListener {
 				Face face = myFace[i];
 				PointF myMidPoint = new PointF();
 				face.getMidPoint(myMidPoint);
-			
-				myEyesDistance = face.eyesDistance();
-				
-				L.t(this.getContext(), myMidPoint.x+"" + myMidPoint.y+" - "+myEyesDistance);
 
-				canvas.drawRect((int) (myMidPoint.x - myEyesDistance * 2), (int) (myMidPoint.y - myEyesDistance * 2),
-						(int) (myMidPoint.x + myEyesDistance * 2), (int) (myMidPoint.y + myEyesDistance * 2), myPaint);
+				myEyesDistance = face.eyesDistance();
+
+				L.t(this.getContext(), "(" + myMidPoint.x + "," + myMidPoint.y
+						+ ") - " + myEyesDistance);
+
+				/*
+				 * Since human face portray rectangle so increased little bit
+				 * towards lower y axis
+				 * 
+				 * (myMidPoint.y + myEyesDistance+myEyesDistance/2) elongated by
+				 * myEyesDistance/2
+				 */
+				canvas.drawRect(
+						(int) (myMidPoint.x - myEyesDistance),
+						(int) (myMidPoint.y - myEyesDistance),
+						(int) (myMidPoint.x + myEyesDistance),
+						(int) (myMidPoint.y + myEyesDistance + myEyesDistance / 2),
+						myPaint);
 			}
 		}
 
